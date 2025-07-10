@@ -3,3 +3,4 @@
 __pycache__/
 *.py[cod]
 **/migrations/__pycache__/
+/db.sqlite3
