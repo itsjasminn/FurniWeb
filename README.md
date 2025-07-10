@@ -21,12 +21,19 @@ Loyihaning asosiy e’tibori — **minimalizm**, **tezkorlik** va **foydalanuvch
 
 FurniWeb/
 ├── furni/ # Asosiy Django app (mahsulotlar, buyurtmalar, foydalanuvchilar)
+
 ├── root/ # Django sozlamalari (settings, urls)
+
 ├── templates/ # HTML shablonlar
+
 ├── static/ # Statik fayllar (CSS, JS, rasm)
+
 ├── media/ # Yuklangan rasm fayllari
+
 ├── manage.py # Django boshqaruv fayli
+
 ├── requirements.txt# Kutubxonalar ro‘yxati
+
 └── README.md # Loyihaga oid hujjat
 
 
