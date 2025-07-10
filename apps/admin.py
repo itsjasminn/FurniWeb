@@ -8,7 +8,6 @@ admin.site.site_header = "Lumi"
 admin.site.site_title = "Lumi's Admin Portal"
 admin.site.index_title = "Welcome"
 
-admin.site.unregister(User)
 admin.site.unregister(Group)
 
 

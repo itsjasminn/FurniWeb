@@ -1,0 +1,120 @@
+{% extends 'base/include.html' %}
+{% load static %}
+{% block body %}
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-lg-5">
+                    <div class="intro-excerpt">
+                        <h1>Contact</h1>
+                        <p class="mb-4">Have a question or need assistance? We’re here to help! Get in touch with us
+                            today.</p>
+                        <p>
+                            <a href="" class="btn btn-secondary me-2">Shop Now</a>
+                            <a href="{% url 'shop' %}" class="btn btn-white-outline">Explore</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="hero-img-wrap">
+                        <img src="{% static 'web/images/couch.png' %}" class="img-fluid" alt="Couch">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Contact Info Table -->
+    <div class="untree_co-section">
+        <div class="container">
+            <div class="block">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-8 pb-4">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}"
+                                     role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Display Contact Details in a Table -->
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for detail in contactinfo %}
+                                <tr>
+                                    <td>{{ detail.address }}</td>
+                                    <td>{{ detail.email }}</td>
+                                    <td>{{ detail.phone }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">No contact details available.</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <!-- Contact Form -->
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="text-black" for="{{ form.first_name.id_for_label }}">First
+                                            name</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger">
+                                                {{ form.first_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="text-black" for="{{ form.last_name.id_for_label }}">Last
+                                            name</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger">
+                                                {{ form.last_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-black" for="{{ form.email.id_for_label }}">Email address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">
+                                        {{ form.email.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group mb-5">
+                                <label class="text-black" for="{{ form.message.id_for_label }}">Message</label>
+                                {{ form.message }}
+                                {% if form.message.errors %}
+                                    <div class="text-danger">
+                                        {{ form.message.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary-hover-outline">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
