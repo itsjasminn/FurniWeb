@@ -81,26 +81,26 @@ python manage.py runserver
 python manage.py createsuperuser
 ```
 
-**✅ Asosiy Funksiyalar**
+# ✅ Asosiy Funksiyalar
 
-# 🪑 Mebel mahsulotlarini yaratish, tahrirlash va ko‘rish
+**🪑 Mebel mahsulotlarini yaratish, tahrirlash va ko‘rish**
 
-# 🛒 Buyurtmalar tizimi
+**🛒 Buyurtmalar tizimi**
 
-# 👤 Foydalanuvchi autentifikatsiyasi
+**👤 Foydalanuvchi autentifikatsiyasi**
 
-# 📷 Mahsulot rasmlarini yuklash
+**📷 Mahsulot rasmlarini yuklash**
 
-# 🧾 Django admin orqali to‘liq boshqaruv
+**🧾 Django admin orqali to‘liq boshqaruv**
 
-**📈 Kelajakdagi Rejalar**
+# 📈 Kelajakdagi Rejalar
 
-# 📱 REST API qo‘shish (mobil ilovalar uchun)
+**📱 REST API qo‘shish (mobil ilovalar uchun)**
 
-# 💳 To‘lov integratsiyasi (Stripe, Payme, Click)
+**💳 To‘lov integratsiyasi (Stripe, Payme, Click)**
 
-# 🧍‍♂️ Foydalanuvchi profilingi va hisob sozlamalari
+**🧍‍♂️ Foydalanuvchi profilingi va hisob sozlamalari**
 
-# 📱 Responsive dizaynni yanada takomillashtirish
+**📱 Responsive dizaynni yanada takomillashtirish**
 
 
