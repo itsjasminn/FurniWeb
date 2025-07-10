@@ -256,6 +256,7 @@ python manage.py createsuperuser
 **Made with 🧡 by Jasmina Ochildiyeva**
 
 [🔗 My GitHub profile](https://github.com/itsjasminn)
+
 [📂 FurniWeb Repository](https://github.com/itsjasminn/FurniWeb)
 
 
