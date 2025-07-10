@@ -16,9 +16,10 @@ admin.site.unregister(Group)
 class ProductAdmin(admin.ModelAdmin):
     list_display = 'image', 'name', 'quantity', 'is_quantity'
 
-
     def is_quantity(self, obj):
         if obj.quantity > 0:
-            return html.format_html('<img width="30" height="30" src="https://img.icons8.com/color/30/checked--v1.png" alt="checked--v1"/>')
+            return html.format_html(
+                '<img width="30" height="30" src="https://img.icons8.com/color/30/checked--v1.png" alt="checked--v1"/>')
         else:
-            return html.format_html('<img width="30" height="30" src="https://img.icons8.com/emoji/30/cross-mark-button-emoji.png" alt="cross-mark-button-emoji"/>')
+            return html.format_html(
+                '<img width="30" height="30" src="https://img.icons8.com/emoji/30/cross-mark-button-emoji.png" alt="cross-mark-button-emoji"/>')

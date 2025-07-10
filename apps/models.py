@@ -9,5 +9,3 @@ class Product(Model):
     quantity = SmallIntegerField(default=1)
     image = ImageField(upload_to='products/')
     created_at = DateField(auto_now=True)
-
-
