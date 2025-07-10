@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, IntegerField, HiddenInput
 from django.forms.fields import EmailField, CharField
 from django.forms.forms import Form
 from django.forms.widgets import TextInput, EmailInput, Textarea
@@ -40,3 +40,14 @@ class MessageForm(ModelForm):
             'email': EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
             'message': Textarea(attrs={'class': 'form-control', 'placeholder': 'Your Message', 'rows': 5}),
         }
+
+
+class CartForm(Form):
+    quantity = IntegerField(min_value=1, initial=1, label="Quantity")
+    product_id = IntegerField(widget=HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        product = kwargs.pop('product', None)
+        super().__init__(*args, **kwargs)
+        if product:
+            self.fields['product_id'].initial = product.id

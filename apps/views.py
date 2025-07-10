@@ -1,65 +1,25 @@
-from django.conf import settings
-from django.contrib import messages
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
-
-from apps.models import Product, ContactInfo
-from .forms import MessageForm
-from .models import Message
-
-
-def home_view(request):
-    return render(request, 'base/include.html')
-
-
-def about_view(request):
-    return render(request, 'menus/about.html')
-
-
-def blog_view(request):
-    return render(request, 'menus/blog.html')
-
-
-def cart_view(request):
-    return render(request, 'menus/cart.html')
-
-
-def checkout_view(request):
-    return render(request, 'menus/checkout.html')
-
-
-def index_view(request):
-    return render(request, 'menus/index.html')
-
-
-def services_view(request):
-    return render(request, 'menus/services.html')
-
-
-def shop_view(request):
-    data = {"products": Product.objects.all()}
-    return render(request, 'menus/shop.html', data)
-
-
-def thankyou_view(request):
-    return render(request, "menus/thankyou.html")
-
-
 import random
 from datetime import timedelta
 
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login
 from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView
+from django.views.generic import View, TemplateView, ListView
 from redis import Redis
 
 from apps.forms import EmailForm, LoginModelForm
+from apps.models import Product, ContactDetails, TeamMember
 from apps.models import User
 from root.settings import EMAIL_HOST_USER
+from .forms import MessageForm
+from .models import Message
 
 
 class LoginFormView(FormView):
@@ -173,7 +133,7 @@ class ContactView(View):
     form_class = MessageForm
 
     def get(self, request, *args, **kwargs):
-        contact_details = ContactInfo.objects.all()
+        contact_details = ContactDetails.objects.all()
         form = self.form_class()
         return render(request, self.template_name, {'form': form, 'contact_details': contact_details})
 
@@ -193,5 +153,83 @@ class ContactView(View):
                 messages.error(request, 'Failed to save your message. Please check your input.')
         else:
             messages.error(request, 'Please correct the errors below.')
-        contact_details = ContactInfo.objects.all()
+        contact_details = ContactDetails.objects.all()
         return render(request, self.template_name, {'form': form, 'contact_details': contact_details})
+
+
+class AboutView(View):
+    template_name = 'menus/about.html'
+
+    def get(self, request, *args, **kwargs):
+        team_members = TeamMember.objects.all()
+        return render(request, self.template_name, {'team_members': team_members})
+
+
+class ServicesView(TemplateView):
+    template_name = 'menus/services.html'
+
+
+class HomeView(ListView):
+    template_name = 'menus/index.html'
+    queryset = Product.objects.all()
+    context_object_name = 'products'
+
+
+class BlogView(TemplateView):
+    template_name = 'menus/blog.html'
+
+
+class ThanksView(TemplateView):
+    template_name = 'menus/thankyou.html'
+
+
+class ShopView(View):
+    template_name = 'menus/shop.html'
+
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.all()
+        return render(request, self.template_name, {'products': products})
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.POST.get('product_id')
+        if product_id:
+            product = get_object_or_404(Product, id=product_id)
+            if product.quantity > 0:
+                cart = request.session.get('cart', {})
+                cart[product_id] = cart.get(product_id, 0) + 1
+                request.session['cart'] = cart
+                messages.success(request, f"Added {product.name} to cart!")
+            else:
+                messages.error(request, "This product is out of stock.")
+            return redirect('shop')
+        return render(request, self.template_name, {'products': Product.objects.all()})
+
+
+class CartView(View):
+    template_name = 'menus/cart.html'
+
+    def get(self, request, *args, **kwargs):
+        cart = request.session.get('cart', {})
+        cart_items = []
+        total = 0
+        for product_id, quantity in cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            if quantity <= product.quantity:
+                cart_items.append({'product': product, 'quantity': quantity, 'total': product.price * quantity})
+                total += product.price * quantity
+        return render(request, self.template_name, {'cart_items': cart_items, 'total': total})
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.POST.get('remove_product_id')
+        if product_id:
+            cart = request.session.get('cart', {})
+            if product_id in cart:
+                del cart[product_id]
+                request.session['cart'] = cart
+                messages.success(request, "Item removed from cart!")
+            return redirect('cart')
+        return self.get(request, *args, **kwargs)
+
+
+class CheckoutView(View):
+    template_name = 'menus/checkout.html'

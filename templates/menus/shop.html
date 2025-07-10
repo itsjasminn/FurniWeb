@@ -11,7 +11,6 @@
                     </div>
                 </div>
                 <div class="col-lg-7">
-
                 </div>
             </div>
         </div>
@@ -21,27 +20,33 @@
     <div class="untree_co-section product-section before-footer-section">
         <div class="container">
             <div class="row">
-                
-                <!-- Start Column 1 -->
-                 {% for product in products %}
-                 	<div class="col-12 col-md-4 col-lg-3 mb-5">
-                    <a class="product-item" href="#">
-                        <img src="{{ product.image.url }}" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">{{ product.name }}</h3>
-                        <strong class="product-price">${{ product.price }}</strong>
-
-                        <span class="icon-cross">
-								<img src="{% static 'web/images/cross.svg' %}" class="img-fluid">
-							</span>
-                    </a>
-                </div>
-                <!-- End Column 1 -->
-                 {% endfor %}
-                 
-                
-
+                {% for product in products %}
+                    <div class="col-12 col-md-4 col-lg-3 mb-5">
+                        <div class="product-item">
+                            <a class="product-item" href="{% url 'cart' %}">
+                                <img src="{{ product.image.url }}" class="img-fluid product-thumbnail">
+                                <h3 class="product-title">{{ product.name }}</h3>
+                                <strong class="product-price">${{ product.price }}</strong>
+                            </a>
+                            <form method="post" action="{% url 'shop' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-outline-success">+</button>
+                            </form>
+                            <span class="icon-cross">
+                                <img src="{% static 'web/images/cross.svg' %}" class="img-fluid">
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
-
 {% endblock %}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Verify Code</title>
     <style>
         * {
             margin: 0;
@@ -71,6 +71,35 @@
             transform: translateX(-2px);
         }
 
+        .verification-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #38b2ac 0%, #2d5a5a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .verification-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
 
         .title {
             font-size: 2.2rem;
@@ -78,12 +107,25 @@
             color: #2d3748;
             margin-bottom: 0.5rem;
             line-height: 1.2;
+            text-align: center;
         }
 
         .subtitle {
             color: #718096;
             font-size: 1.1rem;
             margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .email-display {
+            background: rgba(56, 178, 172, 0.1);
+            border: 1px solid rgba(56, 178, 172, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            color: #2d5a5a;
         }
 
         .form-group {
@@ -103,9 +145,11 @@
             padding: 1rem 1.2rem;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            letter-spacing: 0.5rem;
         }
 
         .form-input:focus {
@@ -115,16 +159,43 @@
             transform: translateY(-2px);
         }
 
-
-        .checkbox-label a {
-            color: #38b2ac;
-            text-decoration: none;
-            font-weight: 500;
+        .sms-input {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.3rem;
+            text-align: center;
         }
 
-        .checkbox-label a:hover {
+        .timer {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .timer.active {
+            color: #e53e3e;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #38b2ac;
+            font-weight: 600;
+            cursor: pointer;
             text-decoration: underline;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .resend-btn:hover {
             color: #2d5a5a;
+        }
+
+        .resend-btn:disabled {
+            color: #cbd5e0;
+            cursor: not-allowed;
+            text-decoration: none;
         }
 
         .submit-btn {
@@ -160,16 +231,6 @@
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(56, 178, 172, 0.3);
-        }
-
-        .footer-links a {
-            color: #38b2ac;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: #2d5a5a;
         }
 
         @media (max-width: 480px) {
@@ -262,18 +323,115 @@
         </a>
     </div>
 
-    <h1 class="title">Furniture</h1>
-    <p class="subtitle">Enter your email to login</p>
+    <div class="verification-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z"
+                  fill="currentColor"/>
+            <path d="M22 6L12 13L2 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
 
-    <form action="{% url 'login' %}" method="POST">
+    <h1 class="title">Verify SMS code</h1>
+    <p class="subtitle">Enter the code sent to your email</p>
+
+    <div class="email-display">{{ email }}</div>
+
+    <form action="{% url 'verify_code' %}" method="POST">
         {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email }}">
+
         <div class="form-group">
-            <label class="form-label" for="email">Email address</label>
-            <input type="email" class="form-input" id="email" name="email" placeholder="example@gmail.com" required>
+            <label class="form-label" for="sms_code">SMS kod</label>
+            <input type="text" class="form-input sms-input" id="sms_code" name="sms" placeholder="000000" maxlength="6"
+                   required autocomplete="off">
         </div>
 
-        <button type="submit" class="submit-btn">Get SMS code</button>
+        <div class="timer" id="timer">
+            <span id="countdown">Resend code: <span id="time">60</span> soniya</span>
+            <button type="button" class="resend-btn" id="resendBtn" disabled onclick="resendCode()">
+                Resend code
+            </button>
+        </div>
+
+        <button type="submit" class="submit-btn">Log in</button>
     </form>
 </div>
+
+<script>
+    // Timer functionality
+    let timeLeft = 60;
+    const timerElement = document.getElementById('time');
+    const resendBtn = document.getElementById('resendBtn');
+    const countdown = document.getElementById('countdown');
+
+    function updateTimer() {
+        if (timeLeft > 0) {
+            timerElement.textContent = timeLeft;
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            countdown.style.display = 'none';
+            resendBtn.disabled = false;
+            resendBtn.style.display = 'inline-block';
+        }
+    }
+
+    updateTimer();
+
+    // Auto-format SMS code input
+    const smsInput = document.getElementById('sms_code');
+    smsInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 6) {
+            value = value.slice(0, 6);
+        }
+        e.target.value = value;
+    });
+
+    // Resend code functionality
+    function resendCode() {
+        const email = document.querySelector('input[name="email"]').value;
+
+        fetch('/send-sms/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({email})
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Reset timer
+                    timeLeft = 60;
+                    countdown.style.display = 'inline';
+                    resendBtn.style.display = 'none';
+                    resendBtn.disabled = true;
+                    updateTimer();
+
+                    // Show success message
+                    alert('SMS kod qayta yuborildi!');
+                } else {
+                    alert(data.message || 'Xatolik yuz berdi');
+                }
+            });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 </body>
 </html>

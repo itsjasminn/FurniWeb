@@ -1,8 +1,6 @@
 {% extends 'base/include.html' %}
 {% load static %}
 {% block body %}
-    <!-- End Header/Navigation -->
-
     <!-- Start Hero Section -->
     <div class="hero">
         <div class="container">
@@ -13,14 +11,11 @@
                     </div>
                 </div>
                 <div class="col-lg-7">
-
                 </div>
             </div>
         </div>
     </div>
     <!-- End Hero Section -->
-
-
 
     <div class="untree_co-section before-footer-section">
         <div class="container">
@@ -39,61 +34,42 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td class="product-thumbnail">
-                                    <img src="{% static "web/images/product-1.png" %}" alt="Image" class="img-fluid">
-                                </td>
-                                <td class="product-name">
-                                    <h2 class="h5 text-black">Product 1</h2>
-                                </td>
-                                <td>$49.00</td>
-                                <td>
-                                    <div class="input-group mb-3 d-flex align-items-center quantity-container"
-                                         style="max-width: 120px;">
-                                        <div class="input-group-prepend">
-                                            <button class="btn btn-outline-black decrease" type="button">&minus;
-                                            </button>
+                            {% for item in cart_items %}
+                                <tr>
+                                    <td class="product-thumbnail">
+                                        <img src="{{ item.product.image.url }}" alt="Image" class="img-fluid">
+                                    </td>
+                                    <td class="product-name">
+                                        <h2 class="h5 text-black">{{ item.product.name }}</h2>
+                                    </td>
+                                    <td>${{ item.product.price }}</td>
+                                    <td>
+                                        <div class="input-group mb-3 d-flex align-items-center quantity-container"
+                                             style="max-width: 120px;">
+                                            <div class="input-group-prepend">
+                                                <button class="btn btn-outline-black decrease" type="button">-</button>
+                                            </div>
+                                            <input type="text" class="form-control text-center quantity-amount"
+                                                   value="{{ item.quantity }}" readonly>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-black increase" type="button">+</button>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control text-center quantity-amount" value="1"
-                                               placeholder="" aria-label="Example text with button addon"
-                                               aria-describedby="button-addon1">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                                        </div>
-                                    </div>
-
-                                </td>
-                                <td>$49.00</td>
-                                <td><a href="#" class="btn btn-black btn-sm">X</a></td>
-                            </tr>
-
-                            <tr>
-                                <td class="product-thumbnail">
-                                    <img src="{% static "web/images/product-2.png" %}" alt="Image" class="img-fluid">
-                                </td>
-                                <td class="product-name">
-                                    <h2 class="h5 text-black">Product 2</h2>
-                                </td>
-                                <td>$49.00</td>
-                                <td>
-                                    <div class="input-group mb-3 d-flex align-items-center quantity-container"
-                                         style="max-width: 120px;">
-                                        <div class="input-group-prepend">
-                                            <button class="btn btn-outline-black decrease" type="button">&minus;
-                                            </button>
-                                        </div>
-                                        <input type="text" class="form-control text-center quantity-amount" value="1"
-                                               placeholder="" aria-label="Example text with button addon"
-                                               aria-describedby="button-addon1">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                                        </div>
-                                    </div>
-
-                                </td>
-                                <td>$49.00</td>
-                                <td><a href="#" class="btn btn-black btn-sm">X</a></td>
-                            </tr>
+                                    </td>
+                                    <td>${{ item.total }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'cart' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="remove_product_id" value="{{ item.product.id }}">
+                                            <button type="submit" class="btn btn-black btn-sm">X</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">Your cart is empty.</td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -107,7 +83,8 @@
                             <button class="btn btn-black btn-sm btn-block">Update Cart</button>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-outline-black btn-sm btn-block">Continue Shopping</button>
+                            <a href="{% url 'shop' %}" class="btn btn-outline-black btn-sm btn-block">Continue
+                                Shopping</a>
                         </div>
                     </div>
                     <div class="row">
@@ -136,7 +113,7 @@
                                     <span class="text-black">Subtotal</span>
                                 </div>
                                 <div class="col-md-6 text-right">
-                                    <strong class="text-black">$230.00</strong>
+                                    <strong class="text-black">${{ total }}</strong>
                                 </div>
                             </div>
                             <div class="row mb-5">
@@ -144,15 +121,14 @@
                                     <span class="text-black">Total</span>
                                 </div>
                                 <div class="col-md-6 text-right">
-                                    <strong class="text-black">$230.00</strong>
+                                    <strong class="text-black">${{ total }}</strong>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <button class="btn btn-black btn-lg py-3 btn-block"
-                                            onclick="window.location='checkout.html'">Proceed To Checkout
-                                    </button>
+                                    <a href="{% url 'checkout' %}" class="btn btn-black btn-lg py-3 btn-block">Proceed
+                                        To Checkout</a>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +137,5 @@
             </div>
         </div>
     </div>
-
-
     <!-- Start Footer Section -->
 {% endblock %}

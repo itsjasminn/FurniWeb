@@ -1,7 +1,8 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager, AbstractUser
 from django.core.exceptions import ValidationError
-from django.db.models import Model, TextField, CharField, ImageField, DecimalField, DateField
+from django.db.models import Model, TextField, CharField, ImageField, DecimalField, DateField, ForeignKey, \
+    PositiveIntegerField, CASCADE
 from django.db.models.fields import SmallIntegerField, EmailField, DateTimeField
 
 
@@ -71,8 +72,35 @@ class Message(Model):
             return False
 
 
-class ContactInfo(Model):
+class ContactDetails(Model):
     address = CharField(max_length=255)
     email = EmailField(max_length=255)
     phone = CharField(max_length=20)
     created_at = DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.address
+
+
+class TeamMember(Model):
+    name = CharField(max_length=100)
+    title = CharField(max_length=100)
+    description = TextField()
+    image = ImageField(upload_to='team_images/', null=True, blank=True)
+    created_at = DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class CartItem(Model):
+    product = ForeignKey(Product, on_delete=CASCADE)
+    quantity = PositiveIntegerField(default=1)
+    added_at = DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    @property
+    def total_price(self):
+        return self.quantity * self.product.price
